@@ -1,6 +1,6 @@
 const { Link, useParams, useSearchParams, BrowserRouter } = ReactRouterDOM;
 
-const Header = () => {
+export const Header = () => {
   const params = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   
@@ -24,4 +24,3 @@ const Header = () => {
   )
 }
 
-export default Header

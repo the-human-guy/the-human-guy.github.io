@@ -6,12 +6,12 @@ const {
   Route
 } = ReactRouterDOM
 
-import HomePage from "/js/pages/HomePage.js";
-import Header from "/js/components/header/menu.js";
+import { HomePage } from "./pages/HomePage.js";
+import { Header } from "./components/header/menu.js";
 
 const BASE_URL = '/'
 
-const App = () => {
+export const App = () => {
   return (
     <>      
       <BrowserRouter basename={BASE_URL}>
@@ -24,5 +24,3 @@ const App = () => {
     
   );
 };
-
-export default App;

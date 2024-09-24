@@ -3,7 +3,7 @@ import { isBase64 } from "../utils/Rgx_test.js";
 
 const { useEffect, useState } = React
 
-const RsaStringDecryptPage = () => {
+export const RsaStringDecryptPage = () => {
   const [intputString, setIntputString] = useState("");
   const [decryptedString, setDecryptedString] = useState("");
   const [rsaKeyPair, setRsaKeyPair] = useState({
@@ -187,6 +187,3 @@ const RsaStringDecryptPage = () => {
     </>
   );
 };
-
-
-export default RsaStringDecryptPage;

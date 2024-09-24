@@ -1,4 +1,4 @@
-import App from '/js/App.js'
+import { App } from './js/App.js'
 // import '/css/index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(

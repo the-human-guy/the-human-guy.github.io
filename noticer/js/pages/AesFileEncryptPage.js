@@ -9,7 +9,7 @@ import { is256BitHex } from "../utils/Rgx_test.js";
 
 const { useEffect, useState } = React
 
-function AesFileEncryptorPage() {
+export function AesFileEncryptPage() {
   const [inputFile, setInputFile] = useState(null);
   const [algorithm, setAlgorithm] = useState("AES256");
   const [passphrase, setPassphrase] = useState("");
@@ -355,4 +355,3 @@ function AesFileEncryptorPage() {
   );
 }
 
-export default AesFileEncryptorPage;
