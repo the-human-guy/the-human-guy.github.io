@@ -9,7 +9,7 @@ const {
 import { HomePage } from "./pages/HomePage.js";
 import { Header } from "./components/header/menu.js";
 
-const BASE_URL = '/'
+const BASE_URL = '/noticer/'
 
 export const App = () => {
   return (
