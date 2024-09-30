@@ -1,16 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
+/* base */
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -18,13 +11,8 @@
   -webkit-text-size-adjust: 100%;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+.main {
+  padding: 1rem;
 }
 
 body {
@@ -32,24 +20,93 @@ body {
   display: flex;
   min-width: 320px;
   min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  color: var(--text-color-primary);
+  background-color: var(--bg-color-primary);
 }
 
 
 
+/* theme */
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    --bg-color-primary: #CCCCCC;
+    --text-color-primary: #333333;
+    --link-color-primary: #333333;
+    --link-hover-color-primary: #1b1b1b;
+    --button-bg-color-primary: #f9f9f9; 
   }
-  a:hover {
-    color: #747bff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color-primary: #000000;
+    --text-color-primary: #CCCCCC;
+    --link-color-primary: #CCCCCC;
+    --link-hover-color-primary: #6c6c6c;
   }
-  button {
-    background-color: #f9f9f9;
+}
+
+
+
+/* ui */
+a {
+  font-weight: 500;
+  text-decoration: inherit;
+  color: var(--link-color-primary);
+}
+a:hover {
+  color: var(--link-hover-color-primary);
+}
+
+button {
+  background-color: var(--button-bg-color-primary);
+}
+
+
+
+/* header */
+.header {
+  display: flex;
+  flex-direction: row;
+  gap: 4rem;
+  padding: 1rem;
+}
+
+
+
+/* todo */
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
   }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
 }

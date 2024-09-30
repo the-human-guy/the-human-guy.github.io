@@ -1,5 +1,3 @@
-// import "/css/App.css";
-
 const {
   BrowserRouter,
   Routes,
@@ -9,18 +7,17 @@ const {
 import { HomePage } from "./pages/HomePage.js";
 import { Header } from "./components/header/menu.js";
 
-const BASE_URL = '/noticer/'
+const BASE_URL = location.pathname
 
 export const App = () => {
   return (
-    <>      
-      <BrowserRouter basename={BASE_URL}>
-      <Header></Header>
+    <BrowserRouter basename={BASE_URL}>
+      <Header />
+      <div className="main">
         <Routes>
             <Route path="/" element={<HomePage />} />
         </Routes>
-      </BrowserRouter>
-    </>
-    
+      </div>
+    </BrowserRouter>    
   );
 };

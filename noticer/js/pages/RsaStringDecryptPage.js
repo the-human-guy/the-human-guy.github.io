@@ -59,7 +59,7 @@ export const RsaStringDecryptPage = () => {
           <div>
             <label
               htmlFor="small-input"
-              className="whitespace-normal break-all font-bold block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              className=""
             >
               Input Rsa Encrypted String (Base64) (ex.
                 KbQhUn9U2mm96q4ZARf7k8gF7+Ir/HGn/Xa1EFkPvtGDJvyvxqi/SkF+jYUZk1Nb/5QZWl6MXjQhws242K3KGh7j4G2LC6/wv7lkHU4vm5DmYv5HnDKGrDQFzYioYL6/x3M2RSySDqCnTZ73bCR2MHhPL5Js5rxP2LkcDnuG8oePF3cd09PeFlyDBNjl/iY57Xx/7pWWi6T0MbQCQdMDeoFELQZIXaVTWLzHuJO6P8zrtCmLORarmdBtsnq7e1YaSWQJoPBjuGtcpzQYKiUjbwvDYBW69/9/u70V7G+F4m1cL2ESfu8+wsLIQgW3B6eRgo0RvPbvM+BiZxSl5LZWVQ==)
@@ -68,7 +68,7 @@ export const RsaStringDecryptPage = () => {
               onChange={onKeyInputChange}
               type="text"
               id="small-input"
-              className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="input-text"
             />
             {intputString && !isBase64(intputString) && (
               <div className="text-red-500">Key must be valid Base64 string</div>
@@ -78,7 +78,7 @@ export const RsaStringDecryptPage = () => {
           {/* <div>
             <label
               htmlFor="small-input"
-              className="whitespace-normal break-all font-bold block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              className=""
             >
               Input Encrypted AES256 key  (ex.
                 SVtCR+N481hggkOrn63NQdrhcTI5BTrTKIxmGRXKgz6TxmmfcL/wI5BXYVmSd7h25bl6ZqGss6PekgEmkjwgtRFZAQldHOyVLQgM3jaqR9ytTG2667Qm/YabLkYcHEF6c126WxWrZ9j+IUCOOL7L5MZKjZ2oMIAhfULMie0q+DsyNfzoiUcZVQm6/dsj2QVb9JEchG3bd1ndAjzFKe1A+jmaWoD7r6JUrKtt4v1YmpbZZYazcIgndtPX935BoAFcovqBe3w/1k7MD8eUAe56I3GRd2AD5iKdnSPOrT7msKjUzRrJwd2DfLJI7W9ilKDq0REYUwVJNzuapVnWhJQalw==)
@@ -97,21 +97,21 @@ export const RsaStringDecryptPage = () => {
             {/* <button
               type="button"
               onClick={generateRSAKey}
-              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              className="button"
             >
               Generate RSA Key
             </button>
             <button
               type="button"
               onClick={downloadPemFiles}
-              className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+              className="button"
             >
               Download Pem Files
             </button> */}
             <div className="flex items-center justify-center">
               <label
                 htmlFor="dropzone-file-pem-private"
-                className="cursor-pointer text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                className="input-dropzone"
               >
                 Import Private Key Pem File
                 <input
@@ -143,7 +143,7 @@ export const RsaStringDecryptPage = () => {
                       value={rsaKeyPair.privateKey}
                       id="message"
                       rows="6"
-                      className="resize-none block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className="textarea"
                       placeholder="Write your thoughts here..."
                     ></textarea>
                   </div>
@@ -155,7 +155,7 @@ export const RsaStringDecryptPage = () => {
                       value={rsaKeyPair.publicKey}
                       id="message"
                       rows="6"
-                      className="resize-none block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className="textarea"
                       placeholder="Write your thoughts here..."
                     ></textarea>
                   </div>
@@ -167,7 +167,7 @@ export const RsaStringDecryptPage = () => {
                     <button
                       type="button"
                       onClick={decryptKeyRsa}
-                      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                      className="button"
                     >
                       Decrypt the input key with RSA
                     </button>
