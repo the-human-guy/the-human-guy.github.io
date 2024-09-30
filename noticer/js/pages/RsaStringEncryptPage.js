@@ -69,13 +69,12 @@ export const RsaStringEncryptPage = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center">
-        <h1 className="pt-[20px] pb-[20px]">RSA String Encrypt</h1>
-        <div className="pt-[10px] text-left w-full flex-1">
+      <div>
+        <h1>RSA String Encrypt</h1>
+        <div>
           <div>
             <label
               htmlFor="small-input"
-              className="whitespace-normal break-all font-bold block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
               Input string to encrypt
             </label>
@@ -83,35 +82,30 @@ export const RsaStringEncryptPage = () => {
               onChange={onKeyInputChange}
               type="text"
               id="small-input"
-              className="input-text"
             />
            
           </div>
-          <div className="flex mt-[10px]">
+          <div>
             <button
               type="button"
               onClick={generateRSAKey}
-              className="button"
             >
               Generate RSA Key
             </button>
             <button
               type="button"
               onClick={downloadPemFiles}
-              className="button"
             >
               Download Pem Files
             </button>
-            <div className="flex items-center justify-center">
+            <div>
               <label
                 htmlFor="dropzone-file-pem-public"
-                className="cursor-pointer button"
               >
                 Import Public Key Pem File
                 <input
                   id="dropzone-file-pem-public"
                   type="file"
-                  className="hidden"
                   onChange={(e) => changeFilePemPublic(e.target.files)}
                 />
               </label>
@@ -119,37 +113,35 @@ export const RsaStringEncryptPage = () => {
           </div>
           {rsaKeyPair && (rsaKeyPair.privateKey || rsaKeyPair.publicKey) && (
             <>
-              <div className="text-left">
-                <span className="font-bold">Encryption algorithm:</span>{" "}
+              <div>
+                <span>Encryption algorithm:</span>{" "}
                 RSA-OAEP
               </div>
-              <div className="text-left">
-                <span className="font-bold">Modulus length:</span> 2048
+              <div>
+                <span>Modulus length:</span> 2048
               </div>
-              <div className="text-left">
-                <span className="font-bold">Hash:</span> SHA-256
+              <div>
+                <span>Hash:</span> SHA-256
               </div>
-              <div className="flex">
+              <div>
                 {rsaKeyPair.privateKey && (
-                  <div className="flex-1">
+                  <div>
                     <textarea
                       disabled
                       value={rsaKeyPair.privateKey}
                       id="message"
                       rows="6"
-                      className="textarea"
                       placeholder="Write your thoughts here..."
                     ></textarea>
                   </div>
                 )}
                 {rsaKeyPair.publicKey && (
-                  <div className="flex-1">
+                  <div>
                     <textarea
                       disabled
                       value={rsaKeyPair.publicKey}
                       id="message"
                       rows="6"
-                      className="textarea"
                       placeholder="Write your thoughts here..."
                     ></textarea>
                   </div>
@@ -157,18 +149,17 @@ export const RsaStringEncryptPage = () => {
               </div>
               {(rsaKeyPair.publicKey && inputString ) && (
                 <>
-                  <div className="flex mt-[10px]">
+                  <div>
                     <button
                       type="button"
                       onClick={encryptKeyRsa}
-                      className="button"
                     >
                       Encrypt the string with RSA
                     </button>
                   </div>
                   {encryptedString && (
-                    <div className="break-all">
-                    <span className="font-bold">Encrypted string (Base64): </span>{encryptedString}
+                    <div>
+                    <span>Encrypted string (Base64): </span>{encryptedString}
                   </div>
                   )}
                   

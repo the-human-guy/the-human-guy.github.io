@@ -13,11 +13,11 @@ export const App = () => {
   return (
     <BrowserRouter basename={BASE_URL}>
       <Header />
-      <div className="main">
+      <main>
         <Routes>
             <Route path="/" element={<HomePage />} />
         </Routes>
-      </div>
+      </main>
     </BrowserRouter>    
   );
 };

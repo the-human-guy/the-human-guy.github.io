@@ -62,6 +62,14 @@ button {
   background-color: var(--button-bg-color-primary);
 }
 
+.input-text {
+  display: block;
+}
+
+.input-dropzone {
+  display: block;
+}
+
 
 
 /* header */
