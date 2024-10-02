@@ -9,6 +9,9 @@ import { is256BitHex } from "../utils/Rgx_test.js";
 
 const { useEffect, useState } = React
 
+const FILE_MAX_SIZE = 1024 * 1024 * 50
+const FILE_MAX_SIZE_LABEL = 'max. 50MB'
+
 export function AesFileEncryptPage() {
   const [inputFile, setInputFile] = useState(null);
   const [algorithm, setAlgorithm] = useState("AES256");
@@ -22,15 +25,14 @@ export function AesFileEncryptPage() {
     if (!file) {
       return;
     }
-    if (file.size > 1024 * 1024 * 50) {
-      return alert("文件太大");
+    if (file.size > FILE_MAX_SIZE) {
+      return alert(FILE_MAX_SIZE_LABEL);
     }
     console.log(files);
 
     setInputFile(file);
     setTimeout(() => {
       document.getElementById("file-input-form").reset();
-      step(2);
     }, 50);
   };
 
@@ -46,27 +48,6 @@ export function AesFileEncryptPage() {
     const ivHex = await e.target.value.substring(0, 32);
     setAesIv(ivHex);
   };
-
-  const step = (stepNum) => {
-    console.log("step");
-    if (stepNum) {
-      const nextStep = document.getElementById("step" + stepNum);
-      if (nextStep) {
-        nextStep.scrollIntoView({ behavior: "smooth" });
-      } else {
-        const step1 = document.getElementById("step1");
-        if (step1) {
-          step1.scrollIntoView({ behavior: "smooth" });
-        }
-      }
-    } else {
-      const step1 = document.getElementById("step1");
-      if (step1) {
-        step1.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-  };
-
 
   useEffect(() => {
     const getAesKey = async () => {
@@ -140,17 +121,15 @@ export function AesFileEncryptPage() {
     window.URL.revokeObjectURL(url);
   };
 
-  
-
-  
-
   return (
     <div>
       <div>
         <h1>AES256 File Encrypt</h1>
+
+        {/* file input */}
         <form id="file-input-form">
           <label htmlFor="dropzone-file">
-              <span>Click to upload a file (max. 50MB)</span>
+              <span>Click to upload a file ({FILE_MAX_SIZE_LABEL})</span>
               <input
                 id="dropzone-file"
                 type="file"
@@ -160,147 +139,126 @@ export function AesFileEncryptPage() {
         </form>
       </div>
 
+      {/* file added */}
       {inputFile && (
-        <div id="step2">
-          <button
-            onClick={() => step(1)}
-            type="button"
-          >
-            <svg
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 14 10"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                strokeWidth="2"
-                d="M1 5h12m0 0L9 1m4 4L9 9"
-              />
-            </svg>
-          </button>
+        <div>
+          <br />
           <div>
             <div>
-              <div>
-                <span>File name:</span>{" "}
-                {inputFile.name}
-              </div>
-              <div>
-                <span>Last modified date:</span>{" "}
-                {inputFile.lastModifiedDate.toString()}
-              </div>
-              <div>
-                <span>Size:</span> {inputFile.size}
-              </div>
-              <div>
-                <span>Type:</span> {inputFile.type}
-              </div>
+              <span>File name:</span>{" "}
+              {inputFile.name}
+            </div>
+            <div>
+              <span>Last modified date:</span>{" "}
+              {inputFile.lastModifiedDate.toString()}
+            </div>
+            <div>
+              <span>Size:</span> {inputFile.size}
+            </div>
+            <div>
+              <span>Type:</span> {inputFile.type}
             </div>
           </div>
-          <div>
-            
-          </div>
-          {algorithm === "AES256" && inputFile && (
-            <>
-              <div>
-                {((!passphrase && !aesKey) || passphrase) && (
-                  <div>
-                    <label htmlFor="small-input">
-                      Input passphrase (ex. 123456)
-                    </label>
-                    <input
-                      onChange={onPassPhraseChange}
-                      type="text"
-                      id="small-input"
-                    />
-                  </div>
-                )}
 
-                {((!passphrase && !aesKey) || (!passphrase && aesKey)) && (
+          <br />
+
+          {algorithm === "AES256" && inputFile && (
+            <fieldset>
+              {((!passphrase && !aesKey) || passphrase) && (
+                <div>
+                  <label htmlFor="input-pass">
+                    Input passphrase (ex. 123456)
+                  </label>
+                  <input
+                    onChange={onPassPhraseChange}
+                    type="text"
+                    id="input-pass"
+                  />
+                </div>
+              )}
+
+              {((!passphrase && !aesKey) || (!passphrase && aesKey)) && (
+                <div>
+                  <label htmlFor="small-input">
+                    Or Input key (256bit Hex) (ex.
+                      8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92)
+                  </label>
+                  <input
+                    onChange={onKeyInputChange}
+                    type="text"
+                    id="small-input"
+                  />
+                  {aesKey && !is256BitHex(aesKey) && (
+                    <div>
+                      Key must be 256bit hex
+                    </div>
+                  )}
+                </div>
+              )}
+              {(passphrase || aesKey) && (
+                <>
                   <div>
-                    <label htmlFor="small-input">
-                      Or Input key (256bit Hex) (ex.
-                        8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92)
-                    </label>
-                    <input
-                      onChange={onKeyInputChange}
-                      type="text"
-                      id="small-input"
-                    />
-                    {aesKey && !is256BitHex(aesKey) && (
+                    <div>
+                      <span>
+                        Encryption algorithm:
+                      </span>{" "}
+                      AES-CBC
+                    </div>
+                    {passphrase && (
                       <div>
-                        Key must be 256bit hex
+                        <span>Key algorithm:</span>{" "}
+                        Passphrase + SHA256
                       </div>
                     )}
-                  </div>
-                )}
-                {(passphrase || aesKey) && (
-                  <>
-                    <div>
-                      <div>
-                        <span>
-                          Encryption algorithm:
-                        </span>{" "}
-                        AES-CBC
-                      </div>
-                      {passphrase && (
-                        <div>
-                          <span>Key algorithm:</span>{" "}
-                          Passphrase + SHA256
-                        </div>
-                      )}
 
-                      <div>
-                        <span>
-                          Key (hex)(256bit):
-                        </span>{" "}
-                        {aesKey}
-                      </div>
-                      <div>
-                        <span>Iv algorithm:</span> Key
-                        + substring(0, 32)
-                      </div>
-                      <div>
-                        <span>Iv (hex)(128bit):</span>{" "}
-                        {aesIv}
-                      </div>
-                      <div>
-                        <span>Padding :</span> PKCS#7
-                      </div>
+                    <div>
+                      <span>
+                        Key (hex)(256bit):
+                      </span>{" "}
+                      {aesKey}
                     </div>
                     <div>
-                      <button
-                        type="button"
-                        onClick={encryptAes256}
-                      >
-                        Encrypt
-                      </button>
-                      <button
-                        type="button"
-                        onClick={decryptAes256}
-                      >
-                        Decrypt
-                      </button>
+                      <span>Iv algorithm:</span> Key
+                      + substring(0, 32)
                     </div>
                     <div>
-                      <span>Openssl Equivalent:</span>
+                      <span>Iv (hex)(128bit):</span>{" "}
+                      {aesIv}
                     </div>
                     <div>
-                      <span>Encrypt:</span> openssl
-                      enc -aes-256-cbc -nosalt -e -in input.jpg -out
-                      output.jpg -K {aesKey} -iv {aesIv}
+                      <span>Padding :</span> PKCS#7
                     </div>
-                    <div>
-                      <span>Decrypt:</span> openssl
-                      enc -aes-256-cbc -nosalt -d -in input.jpg -out
-                      output.jpg -K {aesKey} -iv {aesIv}
-                    </div>
-                  </>
-                )}
-              </div>
-            </>
+                  </div>
+                  <div>
+                    <button
+                      type="button"
+                      onClick={encryptAes256}
+                    >
+                      Encrypt
+                    </button>
+                    <button
+                      type="button"
+                      onClick={decryptAes256}
+                    >
+                      Decrypt
+                    </button>
+                  </div>
+                  <div>
+                    <span>Openssl Equivalent:</span>
+                  </div>
+                  <div>
+                    <span>Encrypt:</span> openssl
+                    enc -aes-256-cbc -nosalt -e -in input.jpg -out
+                    output.jpg -K {aesKey} -iv {aesIv}
+                  </div>
+                  <div>
+                    <span>Decrypt:</span> openssl
+                    enc -aes-256-cbc -nosalt -d -in input.jpg -out
+                    output.jpg -K {aesKey} -iv {aesIv}
+                  </div>
+                </>
+              )}
+            </fieldset>
           )}
 
           {algorithm === "RSA" && inputFile && (

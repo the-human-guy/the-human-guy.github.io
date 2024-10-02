@@ -64,7 +64,7 @@ export const encryptAes = async (fileArrayBuffer, keyHex, ivHex) => {
 }
 
 
-// openssl enc -aes-256-cbc -nosalt -d -in test_car_encrypted_web.jpg -out test_car_enc_web_dec_openssl.jpg -K <key in Hex> -iv <iv in Hex>
+// openssl enc -aes-256-cbc -nosalt -d -in in.jpg -out out.jpg -K <key in Hex> -iv <iv in Hex>
 export const decryptAes = async (fileArrayBuffer, keyHex, ivHex) => {
   // decode the Hex-encoded key and IV
   const ivArrayBuffer = _arrayBufferFromHexString(ivHex);
