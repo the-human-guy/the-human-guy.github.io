@@ -173,9 +173,9 @@ export function AesFileEncryptPage() {
 
           )}
         </div>
-        <div class="col">
+        <div class="col" style={{ minWidth: 0 }}>
           {algorithm === "AES256" && inputFile && (
-            <fieldset>
+            <fieldset style={{ minWidth: 0 }}>
               <legend>Cryptography</legend>
               {((!passphrase && !aesKey) || passphrase) && (
                 <div>
@@ -192,8 +192,7 @@ export function AesFileEncryptPage() {
               {((!passphrase && !aesKey) || (!passphrase && aesKey)) && (
                 <div>
                   <label htmlFor="small-input">
-                    Or Input key (256bit Hex) (ex.
-                      8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92)
+                    Or Input key (256bit Hex) (<span data-tooltip="8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92">example</span>)
                   </label>
                   <PasswordInput
                     onChange={onKeyInputChange}
@@ -208,38 +207,56 @@ export function AesFileEncryptPage() {
               )}
               {(passphrase || aesKey) && (
                 <>
-                  <div>
-                    <div>
-                      <span>
-                        Encryption algorithm:
-                      </span>{" "}
-                      AES-CBC
-                    </div>
-                    {passphrase && (
+                  <details class="card">
+                    <summary>Details</summary>
+                    <div style={{ overflow: 'auto', whiteSpace: 'nowrap' }}>
                       <div>
-                        <span>Key algorithm:</span>{" "}
-                        Passphrase + SHA256
+                        <span>
+                          Encryption algorithm:
+                        </span>{" "}
+                        AES-CBC
                       </div>
-                    )}
+                      {passphrase && (
+                        <div>
+                          <span>Key algorithm:</span>{" "}
+                          Passphrase + SHA256
+                        </div>
+                      )}
 
-                    <div>
-                      <span>
-                        Key (hex)(256bit):
-                      </span>{" "}
-                      {aesKey}
+                      <div>
+                        <span>
+                          Key (hex)(256bit):
+                        </span>{" "}
+                        {aesKey}
+                      </div>
+                      <div>
+                        <span>Iv algorithm:</span> Key
+                        + substring(0, 32)
+                      </div>
+                      <div>
+                        <span>Iv (hex)(128bit):</span>{" "}
+                        {aesIv}
+                      </div>
+                      <div>
+                        <span>Padding :</span> PKCS#7
+                      </div>
+                      <div>
+                        <span>Openssl Equivalent:</span>
+                      </div>
+                      <div>
+                        <span>Encrypt:</span> openssl
+                        enc -aes-256-cbc -nosalt -e -in input.jpg -out
+                        output.jpg -K {aesKey} -iv {aesIv}
+                      </div>
+                      <div>
+                        <span>Decrypt:</span> openssl
+                        enc -aes-256-cbc -nosalt -d -in input.jpg -out
+                        output.jpg -K {aesKey} -iv {aesIv}
+                      </div>
                     </div>
-                    <div>
-                      <span>Iv algorithm:</span> Key
-                      + substring(0, 32)
-                    </div>
-                    <div>
-                      <span>Iv (hex)(128bit):</span>{" "}
-                      {aesIv}
-                    </div>
-                    <div>
-                      <span>Padding :</span> PKCS#7
-                    </div>
-                  </div>
+                  </details>
+
+
                   <div>
                     <button
                       type="button"
@@ -259,19 +276,6 @@ export function AesFileEncryptPage() {
                     >
                       Decrypt & Edit
                     </button>
-                  </div>
-                  <div>
-                    <span>Openssl Equivalent:</span>
-                  </div>
-                  <div>
-                    <span>Encrypt:</span> openssl
-                    enc -aes-256-cbc -nosalt -e -in input.jpg -out
-                    output.jpg -K {aesKey} -iv {aesIv}
-                  </div>
-                  <div>
-                    <span>Decrypt:</span> openssl
-                    enc -aes-256-cbc -nosalt -d -in input.jpg -out
-                    output.jpg -K {aesKey} -iv {aesIv}
                   </div>
                 </>
               )}
