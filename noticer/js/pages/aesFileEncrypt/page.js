@@ -6,6 +6,7 @@ import {
 } from "../../utils/aes_encryption.js";
 import { is256BitHex } from "../../utils/rgx_test.js";
 import { FileEditor } from './components/fileEditor.js';
+import { PasswordInput } from '../../components/passwordInput.js';
 
 const { useEffect, useState } = React
 
@@ -181,9 +182,8 @@ export function AesFileEncryptPage() {
                   <label htmlFor="input-pass">
                     Input passphrase (ex. 123456)
                   </label>
-                  <input
+                  <PasswordInput
                     onChange={onPassPhraseChange}
-                    type="text"
                     id="input-pass"
                   />
                 </div>
@@ -195,9 +195,8 @@ export function AesFileEncryptPage() {
                     Or Input key (256bit Hex) (ex.
                       8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92)
                   </label>
-                  <input
+                  <PasswordInput
                     onChange={onKeyInputChange}
-                    type="text"
                     id="small-input"
                   />
                   {aesKey && !is256BitHex(aesKey) && (
