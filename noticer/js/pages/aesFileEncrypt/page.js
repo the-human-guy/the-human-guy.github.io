@@ -1,4 +1,3 @@
-
 import {
   encryptAes,
   getKeyFromPassphrase,
@@ -6,6 +5,7 @@ import {
   decryptAes,
 } from "../../utils/aes_encryption.js";
 import { is256BitHex } from "../../utils/rgx_test.js";
+import { FileEditor } from './components/fileEditor.js';
 
 const { useEffect, useState } = React
 
@@ -18,8 +18,9 @@ export function AesFileEncryptPage() {
   const [passphrase, setPassphrase] = useState("");
   const [aesKey, setAesKey] = useState("");
   const [aesIv, setAesIv] = useState("");
-
+  const [usingEditor, setUsingEditor] = useState(false)
   const [rsaKeyPair, setRsaKeyPair] = useState({});
+
   const changeFile = (files) => {
     const file = files[0];
     if (!file) {
@@ -32,7 +33,7 @@ export function AesFileEncryptPage() {
 
     setInputFile(file);
     setTimeout(() => {
-      document.getElementById("file-input-form").reset();
+        // document.getElementById("file-input-form").reset();
     }, 50);
   };
 
@@ -90,7 +91,8 @@ export function AesFileEncryptPage() {
     }
   };
 
-  const decryptAes256 = () => {
+  // action: 'save' | 'edit'
+  const decryptAes256 = (action) => {
     if (inputFile && (passphrase || is256BitHex(aesKey))) {
       const reader = new FileReader();
       reader.onload = async function () {
@@ -101,7 +103,12 @@ export function AesFileEncryptPage() {
             aesIv
           );
           console.log(decrypted);
-          saveOrOpenBlob(new Blob([decrypted]), inputFile.name || decrypted);
+          if (action === 'save') {
+            saveOrOpenBlob(new Blob([decrypted]), inputFile.name || decrypted);
+          } else if (action === 'edit') {
+            setInputFile(new File([new Blob([decrypted], { type: 'text/plain' })], `decrypted-${inputFile.name}`))
+            openInEditor()
+          }
         }catch(err){
           alert('Decryption failed')
         }
@@ -121,8 +128,10 @@ export function AesFileEncryptPage() {
     window.URL.revokeObjectURL(url);
   };
 
+  const openInEditor = () => setUsingEditor(true)
+
   return (
-    <div>
+    <main>
       <div>
         <h1>AES256 File Encrypt</h1>
 
@@ -139,29 +148,28 @@ export function AesFileEncryptPage() {
         </form>
       </div>
 
-      {/* file added */}
-      {inputFile && (
-        <div>
-          <br />
-          <div>
-            <div>
-              <span>File name:</span>{" "}
-              {inputFile.name}
+      <div class="row">
+        <div class="col">
+          {inputFile && (
+            <div class="card">
+              <div>
+                <span>File name:</span>{" "}
+                {inputFile.name}
+              </div>
+              <div>
+                <span>Last modified date:</span>{" "}
+                {inputFile.lastModifiedDate.toString()}
+              </div>
+              <div>
+                <span>Size:</span> {inputFile.size}
+              </div>
+              <div>
+                <span>Type:</span> {inputFile.type}
+              </div>
             </div>
-            <div>
-              <span>Last modified date:</span>{" "}
-              {inputFile.lastModifiedDate.toString()}
-            </div>
-            <div>
-              <span>Size:</span> {inputFile.size}
-            </div>
-            <div>
-              <span>Type:</span> {inputFile.type}
-            </div>
-          </div>
-
-          <br />
-
+          )}
+        </div>
+        <div class="col">
           {algorithm === "AES256" && inputFile && (
             <fieldset>
               {((!passphrase && !aesKey) || passphrase) && (
@@ -238,9 +246,15 @@ export function AesFileEncryptPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={decryptAes256}
+                      onClick={() => decryptAes256('save')}
                     >
-                      Decrypt
+                      Decrypt & Save
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => decryptAes256('edit')}
+                    >
+                      Decrypt & Edit
                     </button>
                   </div>
                   <div>
@@ -265,8 +279,19 @@ export function AesFileEncryptPage() {
             <RsaKeyEncrypt/>
           )}
         </div>
+      </div>
+
+      {inputFile && (
+        <button type="button" onClick={() => openInEditor()}>Open in editor</button>
       )}
-    </div>
+
+      {!!usingEditor && (
+        <div class="card">
+          <FileEditor file={inputFile} onSave={(editedFile) => setInputFile(editedFile)} />
+        </div>
+      )}
+
+    </main>
 
   );
 }

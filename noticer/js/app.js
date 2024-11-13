@@ -13,11 +13,9 @@ export const App = () => {
   return (
     <BrowserRouter basename={BASE_URL}>
       <Header />
-      <main>
-        <Routes>
-            <Route path="/" element={<HomePage />} />
-        </Routes>
-      </main>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+      </Routes>
     </BrowserRouter>    
   );
 };
