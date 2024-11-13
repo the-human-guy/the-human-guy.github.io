@@ -1,3 +1,6 @@
+/* for milligram */
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic');
+
 /* base */
 :root {
   /*
@@ -11,7 +14,23 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
   */
-  --width: 100%;
+  --width: 93%;
+}
+
+html body {
+  	--navpos: fixed;
+	--rem: 11pt;
+	--font-p: 300 1em/1.6 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+	--font-h: 300 1em/1.3 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+	--font-c: 86%/1.4 monospace;
+	--ornament: "‹‹‹ ›››";
+	--border: 1px solid var(--cmed);
+	/* foreground   | background color */
+	--cfg:   #606c76; --cbg: #fff;
+	--cdark: #6c605c; --clight: #f4f5f6;
+	--cmed: #d1d1d1;
+	--clink: #9b4dca;
+	--cemph: #9b4dca; --cemphbg: #9b4dca10;
 }
 
 .main {
@@ -45,10 +64,8 @@
 
 .editor-preview-container {
 	position: relative;
-	padding-bottom: 56.25%; /* 16:9 */
-	padding-top: 25px;
-	height: 0;
 }
+
 .editor-preview-container iframe {
 	position: absolute;
 	top: 0;

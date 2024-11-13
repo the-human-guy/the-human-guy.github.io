@@ -131,7 +131,7 @@ export function AesFileEncryptPage() {
   const openInEditor = () => setUsingEditor(true)
 
   return (
-    <main>
+    <main style={{ paddingBottom: '7rem' }}>
       <div>
         <h1>AES256 File Encrypt</h1>
 
@@ -151,7 +151,8 @@ export function AesFileEncryptPage() {
       <div class="row">
         <div class="col">
           {inputFile && (
-            <div class="card">
+            <fieldset>
+              <legend>File Info</legend>
               <div>
                 <span>File name:</span>{" "}
                 {inputFile.name}
@@ -166,12 +167,15 @@ export function AesFileEncryptPage() {
               <div>
                 <span>Type:</span> {inputFile.type}
               </div>
-            </div>
+              <button type="button" onClick={() => openInEditor()}>Open in editor</button>
+            </fieldset>
+
           )}
         </div>
         <div class="col">
           {algorithm === "AES256" && inputFile && (
             <fieldset>
+              <legend>Cryptography</legend>
               {((!passphrase && !aesKey) || passphrase) && (
                 <div>
                   <label htmlFor="input-pass">
@@ -281,12 +285,9 @@ export function AesFileEncryptPage() {
         </div>
       </div>
 
-      {inputFile && (
-        <button type="button" onClick={() => openInEditor()}>Open in editor</button>
-      )}
-
       {!!usingEditor && (
-        <div class="card">
+        <div class="card info">
+          <p>Editor</p>
           <FileEditor file={inputFile} onSave={(editedFile) => setInputFile(editedFile)} />
         </div>
       )}
