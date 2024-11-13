@@ -37,15 +37,35 @@
         console.error('Error registering service-worker:', err)
         document.getElementById('root').innerText = err.toString()
       }
+
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./service-worker.js', {scope: './'})
-          .then(registration => {
-            window.serviceWorkerRegistration = registration
+          .then(reg => {
+            window.serviceWorkerRegistration = reg
             // use `await window.serviceWorkerRegistration.unregister()` to unregister the service worker
+            if (reg.installing) {
+              const sw = reg.installing || reg.waiting;
+              sw.onstatechange = function() {
+                if (sw.state === 'installed') {
+                  onward();
+                }
+              };
+            } else if (reg.active) {
+              // something's not right or SW is bypassed.
+              // previously-installed SW should have redirected this request to different page
+              console.log('<p>Service Worker is installed and not functioning as intended.<p>Please contact developer.')
+            }
           })
           .catch(onError)
       } else {
         onError('Browser does not support service workers :-(')
+      }
+
+      // SW installed.  Refresh page so SW can respond with SW-enabled page.
+      function onward() {
+        setTimeout(function() {
+          window.location.reload();
+        }, 300);
       }
     </script>
 
