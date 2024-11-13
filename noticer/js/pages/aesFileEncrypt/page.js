@@ -142,7 +142,7 @@ export function AesFileEncryptPage() {
               <input
                 id="dropzone-file"
                 type="file"
-                onChange={(e) => changeFile(e.target.files)}
+                onChange={(e) => {changeFile(e.target.files); setUsingEditor(false); }}
               />
           </label>
         </form>

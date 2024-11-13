@@ -37,6 +37,7 @@ ${fileContent}
 
   return (
     <div>
+      <button type="button" onClick={saveFile}>Save changes</button>
       <button type="button" onClick={wrapWithPre}>{'Wrap with <pre>'}</button>
       <button type="reset" onClick={resetToOriginalFile}>Reset</button>
 
@@ -50,10 +51,7 @@ ${fileContent}
             srcdoc={fileContent}
           ></iframe>
         </div>
-    </div>
-      
-      
-      <button type="button" onClick={saveFile}>Save changes</button>
+      </div>
     </div>
   )
 }
