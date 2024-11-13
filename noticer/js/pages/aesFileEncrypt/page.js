@@ -4,8 +4,8 @@ import {
   getKeyFromPassphrase,
   getIvFromPassphrase,
   decryptAes,
-} from "../utils/AES_encryption.js";
-import { is256BitHex } from "../utils/Rgx_test.js";
+} from "../../utils/aes_encryption.js";
+import { is256BitHex } from "../../utils/rgx_test.js";
 
 const { useEffect, useState } = React
 

@@ -1,19 +1,41 @@
-import { generateRSAKeyPair, encryptStringRsa, decryptStringRsa } from "../utils/RSA_encryption.js";
-import { isBase64 } from "../utils/Rgx_test.js";
+import { generateRSAKeyPair, encryptStringRsa } from "../utils/rsa_encryption.js";
 
-const { useEffect, useState } = React
+const { useState } = ReactRouterDOM;
 
-export const RsaStringDecryptPage = () => {
-  const [intputString, setIntputString] = useState("");
-  const [decryptedString, setDecryptedString] = useState("");
+export const RsaStringEncryptPage = () => {
+  const [inputString, setInputString] = useState("");
+  const [encryptedString, setEncryptedString] = useState("");
   const [rsaKeyPair, setRsaKeyPair] = useState({
     publicKey: "",
     privateKey: "",
   });
 
 
+  const downloadPemFile = (content, fileName) => {
+    const link = document.createElement("a");
+    const file = new Blob([content], { type: "text/plain" });
+    link.href = URL.createObjectURL(file);
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
 
-  const changeFilePemPrivate = (files) => {
+  const generateRSAKey = async () => {
+    const keyPair = await generateRSAKeyPair();
+    setRsaKeyPair(keyPair);
+  };
+
+  const downloadPemFiles = () => {
+    if (rsaKeyPair.privateKey) {
+      downloadPemFile(rsaKeyPair.privateKey, "rsa_private.pem");
+    }
+    if (rsaKeyPair.publicKey) {
+      downloadPemFile(rsaKeyPair.publicKey, "rsa_public.pem");
+    }
+  };
+
+
+  const changeFilePemPublic = (files) => {
     const file = files[0];
     if (!file) {
       return;
@@ -23,74 +45,48 @@ export const RsaStringDecryptPage = () => {
     }
     const reader = new FileReader();
     reader.onload = async function () {
-      const privateKey = reader.result;
+      const publicKey = reader.result;
       setRsaKeyPair({
         ...rsaKeyPair,
-        privateKey: privateKey,
+        publicKey: publicKey,
       });
     };
     reader.readAsText(file);
   };
 
-
-
-  const decryptKeyRsa = async () => {
+  const encryptKeyRsa = async () => {
     try{
-      const decryptedKey = await decryptStringRsa(intputString, rsaKeyPair.privateKey);
-    
-      setDecryptedString(decryptedKey);
+      const encryptedKey = await encryptStringRsa(inputString, rsaKeyPair.publicKey);
+      setEncryptedString(encryptedKey);
     }catch(err){
-      alert('Decryption failed.')
+      alert('Encryption failed.')
     }
-    
-    // const decryptedKey = await decryptStringRsa(encryptedKey, rsaKeyPair.privateKey);
-    // console.log('decrypt: ',decryptedKey)
   };
 
   const onKeyInputChange = async (e) => {
-    setIntputString(e.target.value);
+    setInputString(e.target.value);
   };
 
   return (
     <>
       <div>
-      <h1>RSA String Decrypt</h1>
+        <h1>RSA String Encrypt</h1>
         <div>
           <div>
             <label
               htmlFor="small-input"
             >
-              Input Rsa Encrypted String (Base64) (ex.
-                KbQhUn9U2mm96q4ZARf7k8gF7+Ir/HGn/Xa1EFkPvtGDJvyvxqi/SkF+jYUZk1Nb/5QZWl6MXjQhws242K3KGh7j4G2LC6/wv7lkHU4vm5DmYv5HnDKGrDQFzYioYL6/x3M2RSySDqCnTZ73bCR2MHhPL5Js5rxP2LkcDnuG8oePF3cd09PeFlyDBNjl/iY57Xx/7pWWi6T0MbQCQdMDeoFELQZIXaVTWLzHuJO6P8zrtCmLORarmdBtsnq7e1YaSWQJoPBjuGtcpzQYKiUjbwvDYBW69/9/u70V7G+F4m1cL2ESfu8+wsLIQgW3B6eRgo0RvPbvM+BiZxSl5LZWVQ==)
+              Input string to encrypt
             </label>
             <input
               onChange={onKeyInputChange}
               type="text"
               id="small-input"
             />
-            {intputString && !isBase64(intputString) && (
-              <div>Key must be valid Base64 string</div>
-            )}
+           
           </div>
-
-          {/* <div>
-            <label
-              htmlFor="small-input"
-            >
-              Input Encrypted AES256 key  (ex.
-                SVtCR+N481hggkOrn63NQdrhcTI5BTrTKIxmGRXKgz6TxmmfcL/wI5BXYVmSd7h25bl6ZqGss6PekgEmkjwgtRFZAQldHOyVLQgM3jaqR9ytTG2667Qm/YabLkYcHEF6c126WxWrZ9j+IUCOOL7L5MZKjZ2oMIAhfULMie0q+DsyNfzoiUcZVQm6/dsj2QVb9JEchG3bd1ndAjzFKe1A+jmaWoD7r6JUrKtt4v1YmpbZZYazcIgndtPX935BoAFcovqBe3w/1k7MD8eUAe56I3GRd2AD5iKdnSPOrT7msKjUzRrJwd2DfLJI7W9ilKDq0REYUwVJNzuapVnWhJQalw==)
-            </label>
-            <input
-              onChange={onKeyInputChange}
-              type="text"
-              id="small-input"
-            />
-            {aesKey && !is256BitHex(aesKey) && (
-              <div>Key must be 256bit hex</div>
-            )}
-          </div> */}
           <div>
-            {/* <button
+            <button
               type="button"
               onClick={generateRSAKey}
             >
@@ -101,16 +97,16 @@ export const RsaStringDecryptPage = () => {
               onClick={downloadPemFiles}
             >
               Download Pem Files
-            </button> */}
+            </button>
             <div>
               <label
-                htmlFor="dropzone-file-pem-private"
+                htmlFor="dropzone-file-pem-public"
               >
-                Import Private Key Pem File
+                Import Public Key Pem File
                 <input
-                  id="dropzone-file-pem-private"
+                  id="dropzone-file-pem-public"
                   type="file"
-                  onChange={(e) => changeFilePemPrivate(e.target.files)}
+                  onChange={(e) => changeFilePemPublic(e.target.files)}
                 />
               </label>
             </div>
@@ -151,19 +147,19 @@ export const RsaStringDecryptPage = () => {
                   </div>
                 )}
               </div>
-              {(rsaKeyPair.privateKey && intputString && isBase64(intputString)) && (
+              {(rsaKeyPair.publicKey && inputString ) && (
                 <>
                   <div>
                     <button
                       type="button"
-                      onClick={decryptKeyRsa}
+                      onClick={encryptKeyRsa}
                     >
-                      Decrypt the input key with RSA
+                      Encrypt the string with RSA
                     </button>
                   </div>
-                  {decryptedString && (
+                  {encryptedString && (
                     <div>
-                    <span>Decrypted string: </span>{decryptedString}
+                    <span>Encrypted string (Base64): </span>{encryptedString}
                   </div>
                   )}
                   
