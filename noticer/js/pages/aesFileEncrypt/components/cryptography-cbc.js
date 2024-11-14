@@ -9,7 +9,7 @@ import { PasswordInput } from '../../../components/passwordInput.js';
 const { useEffect, useState } = React
 
 export const CryptographyCBC = ({
-  file: inputFile,
+  arrayBuffer,
   children,
 }) => {
   const [passphrase, setPassphrase] = useState("");
@@ -45,48 +45,34 @@ export const CryptographyCBC = ({
     getAesIv();
   }, [passphrase]);
 
-  const encryptAes256 = (onSuccess) => {
-    if (inputFile && (passphrase || is256BitHex(aesKey))) {
-      const reader = new FileReader();
-      reader.onload = async function () {
-        try{
-          const encrypted = await encryptAes(
-            reader.result,
-            aesKey,
-            aesIv
-          );
-          const newFile = new File([new Blob([encrypted], { type: 'text/plain' })], `encrypted-${inputFile.name}`);
-          onSuccess(newFile);
-        }catch(err){
-          console.error('Encryption failed: ', err)
-          alert('Encryption failed')
-        }
-        
-      };
-      reader.readAsArrayBuffer(inputFile);
+  const encryptAes256 = async (onSuccess) => {
+    if (arrayBuffer && (passphrase || is256BitHex(aesKey))) {
+      try{
+        const encrypted = await encryptAes(
+          arrayBuffer,
+          aesKey,
+          aesIv
+        );
+        onSuccess(encrypted);
+      }catch(err){
+        console.error('Encryption failed: ', err)
+        alert('Encryption failed')
+      }
     }
   };
 
-  const decryptAes256 = (onSuccess) => {
-    if (inputFile && (passphrase || is256BitHex(aesKey))) {
-      const reader = new FileReader();
-      reader.onload = async function () {
-        try{
-          const decrypted = await decryptAes(
-            reader.result,
-            aesKey,
-            aesIv
-          );
-          console.log(decrypted);
-          const newFile = new File([new Blob([decrypted], { type: 'text/plain' })], `decrypted-${inputFile.name}`);
-          onSuccess(newFile)
-        } catch(err) {
-          console.error('Decryption failed: ', err)
-          alert('Decryption failed')
-        }
-       
-      };
-      reader.readAsArrayBuffer(inputFile);
+  const decryptAes256 = async (onSuccess) => {
+    try{
+      const decrypted = await decryptAes(
+        arrayBuffer,
+        aesKey,
+        aesIv
+      );
+      console.log('decryption result: ', arrayBuffer, decrypted);
+      onSuccess(decrypted)
+    } catch(err) {
+      console.error('Decryption failed: ', err)
+      alert('Decryption failed')
     }
   };
 

@@ -16,11 +16,29 @@ const CRYPTO_ALGO = {
 export const Cryptography = (props) => {
   const {
     file,
-    onFileEncrypt,
-    onFileDecrypt,
+    onFileEncrypt: onFileEncryptProp,
+    onFileDecrypt: onFileDecryptProp,
   } = props
   const [selectedAlgo, selectAlgo] = useState(CRYPTO_ALGO.CBC.code);
-  console.log('selectedAlgo: ', selectedAlgo)
+  const [fileArrayBuffer, setFileArrayBuffer] = useState(null)
+
+  useEffect(() => {
+    const reader = new FileReader();
+    reader.onload = async function () {
+      setFileArrayBuffer(reader.result)
+    };
+    reader.readAsArrayBuffer(file);
+  }, [file])
+
+  const onFileEncrypt = (buffer, ...args) => {
+    const newFile = new File([new Blob([buffer], { type: 'text/plain' })], `encrypted-${file.name}`);
+    onFileEncryptProp(newFile, ...args)
+  }
+
+  const onFileDecrypt = (buffer, ...args) => {
+    const newFile = new File([new Blob([buffer], { type: 'text/plain' })], `decrypted-${file.name}`);
+    onFileEncryptProp(newFile, ...args)
+  }
 
   let CryptoComponent = '';
   if (selectedAlgo === CRYPTO_ALGO.GCM.code) {
@@ -38,36 +56,38 @@ export const Cryptography = (props) => {
         <option value={CRYPTO_ALGO.CBC.code}>{CRYPTO_ALGO.CBC.label}</option>
       </select>
 
-      <CryptoComponent file={file}>
-        {({ onEncrypt, onDecrypt }) => (
-          <div>
-            <button
-              type="button"
-              onClick={() => onEncrypt((newFile) => onFileEncrypt(newFile, 'save'))}
-            >
-              Encrypt & Save
-            </button>
-            <button
-              type="button"
-              onClick={() => onEncrypt((newFile) => onFileEncrypt(newFile, 'edit'))}
-            >
-              Encrypt & Edit
-            </button>
-            <button
-              type="button"
-              onClick={() => onDecrypt((newFile) => onFileDecrypt(newFile, 'save'))}
-            >
-              Decrypt & Save
-            </button>
-            <button
-              type="button"
-              onClick={() => onDecrypt((newFile) => onFileDecrypt(newFile, 'edit'))}
-            >
-              Decrypt & Edit
-            </button>
-          </div>
-        )}
-      </CryptoComponent>
+      {!!fileArrayBuffer && (
+        <CryptoComponent arrayBuffer={fileArrayBuffer}>
+          {({ onEncrypt, onDecrypt }) => (
+            <div>
+              <button
+                type="button"
+                onClick={() => onEncrypt((newFile) => onFileEncrypt(newFile, 'save'))}
+              >
+                Encrypt & Save
+              </button>
+              <button
+                type="button"
+                onClick={() => onEncrypt((newFile) => onFileEncrypt(newFile, 'edit'))}
+              >
+                Encrypt & Edit
+              </button>
+              <button
+                type="button"
+                onClick={() => onDecrypt((newFile) => onFileDecrypt(newFile, 'save'))}
+              >
+                Decrypt & Save
+              </button>
+              <button
+                type="button"
+                onClick={() => onDecrypt((newFile) => onFileDecrypt(newFile, 'edit'))}
+              >
+                Decrypt & Edit
+              </button>
+            </div>
+          )}
+        </CryptoComponent>
+      )}
     </fieldset>
   )
 }

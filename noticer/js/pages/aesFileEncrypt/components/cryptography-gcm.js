@@ -1,9 +1,7 @@
 import {
-  encryptAes,
-  getKeyFromPassphrase,
-  getIvFromPassphrase,
-  decryptAes,
-} from "../../../utils/aes_encryption.js";
+  encrypt,
+  decrypt,
+} from "../../../utils/aes-gcm.js";
 import { is256BitHex } from "../../../utils/rgx_test.js";
 import { PasswordInput } from '../../../components/passwordInput.js';
 const { useEffect, useState } = React
@@ -13,36 +11,12 @@ export const CryptographyGCM = ({
   children,
 }) => {
   const [passphrase, setPassphrase] = useState("");
-  const [aesKey, setAesKey] = useState("");
-  const [aesIv, setAesIv] = useState("");
-  const onPassPhraseChange = (e) => {
-    setPassphrase(e.target.value);
-  };
-  const onKeyInputChange = async (e) => {
-    setAesKey(e.target.value);
-    const ivHex = await e.target.value.substring(0, 32);
-    setAesIv(ivHex);
-  };
+  const [cryptoInfo, setCryptoInfo] = useState({});
 
   useEffect(() => {
-    const getAesKey = async () => {
-      if (passphrase) {
-        const keyHex = await getKeyFromPassphrase(passphrase);
-        setAesKey(keyHex);
-      } else {
-        setAesKey("");
-      }
-    };
-    getAesKey();
-    const getAesIv = async () => {
-      if (passphrase) {
-        const ivHex = await getIvFromPassphrase(passphrase);
-        setAesIv(ivHex);
-      } else {
-        setAesIv("");
-      }
-    };
-    getAesIv();
+    (async () => {
+      const info = await encrypt(inputFile)
+    })()
   }, [passphrase]);
 
   const encryptAes256 = (onSuccess) => {
@@ -98,28 +72,12 @@ export const CryptographyGCM = ({
             Input passphrase (ex. 123456)
           </label>
           <PasswordInput
-            onChange={onPassPhraseChange}
+            onChange={(e) => setPassphrase(e.target.value)}
             id="input-pass"
           />
         </div>
       )}
 
-      {((!passphrase && !aesKey) || (!passphrase && aesKey)) && (
-        <div>
-          <label htmlFor="small-input">
-            Or Input key (256bit Hex) (<span data-tooltip="8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92">example</span>)
-          </label>
-          <PasswordInput
-            onChange={onKeyInputChange}
-            id="small-input"
-          />
-          {aesKey && !is256BitHex(aesKey) && (
-            <div>
-              Key must be 256bit hex
-            </div>
-          )}
-        </div>
-      )}
       {(passphrase || aesKey) && (
         <>
           <details class="card">

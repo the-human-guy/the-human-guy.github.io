@@ -42,12 +42,22 @@ const deriveKey = (passwordKey, salt, keyUsage) =>
     keyUsage
   );
 
-async function encryptData(secretData, password) {
+async function encryptData(secretData, password, infoOnly) {
   try {
     const salt = window.crypto.getRandomValues(new Uint8Array(16));
     const iv = window.crypto.getRandomValues(new Uint8Array(12));
     const passwordKey = await getPasswordKey(password);
     const aesKey = await deriveKey(passwordKey, salt, ["encrypt"]);
+
+    if (infoOnly) {
+      return {
+        salt,
+        iv,
+        passwordKey,
+        aesKey,
+      }
+    }
+
     const encryptedContent = await window.crypto.subtle.encrypt(
       {
         name: "AES-GCM",
@@ -56,7 +66,6 @@ async function encryptData(secretData, password) {
       aesKey,
       enc.encode(secretData)
     );
-
     const encryptedContentArr = new Uint8Array(encryptedContent);
     let buff = new Uint8Array(
       salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
