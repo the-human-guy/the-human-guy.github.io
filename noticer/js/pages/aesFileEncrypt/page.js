@@ -1,12 +1,5 @@
-import {
-  encryptAes,
-  getKeyFromPassphrase,
-  getIvFromPassphrase,
-  decryptAes,
-} from "../../utils/aes_encryption.js";
-import { is256BitHex } from "../../utils/rgx_test.js";
 import { FileEditor } from './components/fileEditor.js';
-import { PasswordInput } from '../../components/passwordInput.js';
+import { Cryptography } from './components/cryptography.js';
 
 const { useEffect, useState } = React
 
@@ -15,17 +8,12 @@ const FILE_MAX_SIZE_LABEL = 'max. 50MB'
 
 export function AesFileEncryptPage() {
   const [inputFile, setInputFile] = useState(null);
-  const [algorithm, setAlgorithm] = useState("AES256");
-  const [passphrase, setPassphrase] = useState("");
-  const [aesKey, setAesKey] = useState("");
-  const [aesIv, setAesIv] = useState("");
   const [usingEditor, setUsingEditor] = useState(false)
-  const [rsaKeyPair, setRsaKeyPair] = useState({});
 
   const changeFile = (files) => {
     const file = files[0];
     if (!file) {
-      return;
+      return setInputFile(null);
     }
     if (file.size > FILE_MAX_SIZE) {
       return alert(FILE_MAX_SIZE_LABEL);
@@ -38,88 +26,14 @@ export function AesFileEncryptPage() {
     }, 50);
   };
 
-  const onAlgorithmChange = (e) => {
-    setAlgorithm(e.target.value);
-  };
+  const resetForm = () => {
+    document.getElementById("file-input-form").reset();
+    setInputFile(null);
+  }
 
-  const onPassPhraseChange = (e) => {
-    setPassphrase(e.target.value);
-  };
-  const onKeyInputChange = async (e) => {
-    setAesKey(e.target.value);
-    const ivHex = await e.target.value.substring(0, 32);
-    setAesIv(ivHex);
-  };
+  const openInEditor = () => setUsingEditor(true)
 
-  useEffect(() => {
-    const getAesKey = async () => {
-      if (passphrase) {
-        const keyHex = await getKeyFromPassphrase(passphrase);
-        setAesKey(keyHex);
-      } else {
-        setAesKey("");
-      }
-    };
-    getAesKey();
-    const getAesIv = async () => {
-      if (passphrase) {
-        const ivHex = await getIvFromPassphrase(passphrase);
-        setAesIv(ivHex);
-      } else {
-        setAesIv("");
-      }
-    };
-    getAesIv();
-  }, [passphrase]);
-
-  const encryptAes256 = () => {
-    if (inputFile && (passphrase || is256BitHex(aesKey))) {
-      const reader = new FileReader();
-      reader.onload = async function () {
-        try{
-          const encrypted = await encryptAes(
-            reader.result,
-            aesKey,
-            aesIv
-          );
-          saveOrOpenBlob(new Blob([encrypted]), inputFile.name || "encrypted");
-        }catch(err){
-          alert('Encryption failed')
-        }
-        
-      };
-      reader.readAsArrayBuffer(inputFile);
-    }
-  };
-
-  // action: 'save' | 'edit'
-  const decryptAes256 = (action) => {
-    if (inputFile && (passphrase || is256BitHex(aesKey))) {
-      const reader = new FileReader();
-      reader.onload = async function () {
-        try{
-          const decrypted = await decryptAes(
-            reader.result,
-            aesKey,
-            aesIv
-          );
-          console.log(decrypted);
-          if (action === 'save') {
-            saveOrOpenBlob(new Blob([decrypted]), inputFile.name || decrypted);
-          } else if (action === 'edit') {
-            setInputFile(new File([new Blob([decrypted], { type: 'text/plain' })], `decrypted-${inputFile.name}`))
-            openInEditor()
-          }
-        }catch(err){
-          alert('Decryption failed')
-        }
-       
-      };
-      reader.readAsArrayBuffer(inputFile);
-    }
-  };
-
-  const saveOrOpenBlob = (blob, fileName) => {
+  const downloadFile = (blob, fileName) => {
     const tempEl = document.createElement("a");
     document.body.appendChild(tempEl);
     const url = window.URL.createObjectURL(blob);
@@ -129,7 +43,26 @@ export function AesFileEncryptPage() {
     window.URL.revokeObjectURL(url);
   };
 
-  const openInEditor = () => setUsingEditor(true)
+
+  // action: 'save' | 'edit'
+  const onFileDecrypt = (file, action) => {
+    if (action === 'save') {
+      downloadFile(file)
+    }
+    if (action === 'edit') {
+      setInputFile(file)
+      setUsingEditor(true)
+    }
+  }
+  const onFileEncrypt = (file, action) => {
+    if (action === 'save') {
+      downloadFile(file)
+    }
+    if (action === 'edit') {
+      setInputFile(file)
+      setUsingEditor(true)
+    }
+  }
 
   return (
     <main style={{ paddingBottom: '7rem' }}>
@@ -137,7 +70,7 @@ export function AesFileEncryptPage() {
         <h1>AES256 File Encrypt</h1>
 
         {/* file input */}
-        <form id="file-input-form">
+        <form id="file-input-form" style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
           <label htmlFor="dropzone-file">
               <span>Click to upload a file ({FILE_MAX_SIZE_LABEL})</span>
               <input
@@ -146,12 +79,13 @@ export function AesFileEncryptPage() {
                 onChange={(e) => {changeFile(e.target.files); setUsingEditor(false); }}
               />
           </label>
+          {!!inputFile && <button type="reset" onClick={resetForm}>Reset</button>}
         </form>
       </div>
 
-      <div class="row">
-        <div class="col">
-          {inputFile && (
+      {!!inputFile && (
+        <div class="row">
+          <div class="col">
             <fieldset>
               <legend>File Info</legend>
               <div>
@@ -170,123 +104,16 @@ export function AesFileEncryptPage() {
               </div>
               <button type="button" onClick={() => openInEditor()}>Open in editor</button>
             </fieldset>
-
-          )}
+          </div>
+          <div class="col" style={{ minWidth: 0 }}>
+            <Cryptography
+              file={inputFile}
+              onFileEncrypt={onFileEncrypt}
+              onFileDecrypt={onFileDecrypt}
+            />
+          </div>
         </div>
-        <div class="col" style={{ minWidth: 0 }}>
-          {algorithm === "AES256" && inputFile && (
-            <fieldset style={{ minWidth: 0 }}>
-              <legend>Cryptography</legend>
-              {((!passphrase && !aesKey) || passphrase) && (
-                <div>
-                  <label htmlFor="input-pass">
-                    Input passphrase (ex. 123456)
-                  </label>
-                  <PasswordInput
-                    onChange={onPassPhraseChange}
-                    id="input-pass"
-                  />
-                </div>
-              )}
-
-              {((!passphrase && !aesKey) || (!passphrase && aesKey)) && (
-                <div>
-                  <label htmlFor="small-input">
-                    Or Input key (256bit Hex) (<span data-tooltip="8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92">example</span>)
-                  </label>
-                  <PasswordInput
-                    onChange={onKeyInputChange}
-                    id="small-input"
-                  />
-                  {aesKey && !is256BitHex(aesKey) && (
-                    <div>
-                      Key must be 256bit hex
-                    </div>
-                  )}
-                </div>
-              )}
-              {(passphrase || aesKey) && (
-                <>
-                  <details class="card">
-                    <summary>Details</summary>
-                    <div style={{ overflow: 'auto', whiteSpace: 'nowrap' }}>
-                      <div>
-                        <span>
-                          Encryption algorithm:
-                        </span>{" "}
-                        AES-CBC
-                      </div>
-                      {passphrase && (
-                        <div>
-                          <span>Key algorithm:</span>{" "}
-                          Passphrase + SHA256
-                        </div>
-                      )}
-
-                      <div>
-                        <span>
-                          Key (hex)(256bit):
-                        </span>{" "}
-                        {aesKey}
-                      </div>
-                      <div>
-                        <span>Iv algorithm:</span> Key
-                        + substring(0, 32)
-                      </div>
-                      <div>
-                        <span>Iv (hex)(128bit):</span>{" "}
-                        {aesIv}
-                      </div>
-                      <div>
-                        <span>Padding :</span> PKCS#7
-                      </div>
-                      <div>
-                        <span>Openssl Equivalent:</span>
-                      </div>
-                      <div>
-                        <span>Encrypt:</span> openssl
-                        enc -aes-256-cbc -nosalt -e -in input.jpg -out
-                        output.jpg -K {aesKey} -iv {aesIv}
-                      </div>
-                      <div>
-                        <span>Decrypt:</span> openssl
-                        enc -aes-256-cbc -nosalt -d -in input.jpg -out
-                        output.jpg -K {aesKey} -iv {aesIv}
-                      </div>
-                    </div>
-                  </details>
-
-
-                  <div>
-                    <button
-                      type="button"
-                      onClick={encryptAes256}
-                    >
-                      Encrypt
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => decryptAes256('save')}
-                    >
-                      Decrypt & Save
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => decryptAes256('edit')}
-                    >
-                      Decrypt & Edit
-                    </button>
-                  </div>
-                </>
-              )}
-            </fieldset>
-          )}
-
-          {algorithm === "RSA" && inputFile && (
-            <RsaKeyEncrypt/>
-          )}
-        </div>
-      </div>
+      )}
 
       {!!usingEditor && (
         <div class="card info">
