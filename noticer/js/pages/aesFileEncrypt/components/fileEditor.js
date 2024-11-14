@@ -47,7 +47,7 @@ ${fileContent}
         </div>
         <div class="col editor-preview-container">
           <iframe
-            sandbox
+            sandbox=""
             srcdoc={fileContent}
           ></iframe>
         </div>
