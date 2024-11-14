@@ -13,6 +13,7 @@ export const PasswordInput = (props) => {
           top: '0.3rem',
           right: '0.5rem',
           cursor: 'pointer',
+          userSelect: 'none',
         }}>
           {revealing ? "🔓️" : "🔒️"}
         </div>
