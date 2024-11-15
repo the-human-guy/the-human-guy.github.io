@@ -34,7 +34,7 @@ const deriveKey = (passwordKey, salt, keyUsage) =>
 
 export async function encrypt({ input: secretData, password, infoOnly }) {
   try {
-    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+    const salt = window.crypto.getRandomValues(new Uint8Array(16)); // 128-bit salt
     const iv = window.crypto.getRandomValues(new Uint8Array(12));
     const passwordKey = await getPasswordKey(password);
     const aesKey = await deriveKey(passwordKey, salt, ["encrypt"]);
@@ -48,15 +48,35 @@ export async function encrypt({ input: secretData, password, infoOnly }) {
       }
     }
 
+    // encryptedContent is ArrayBuffer
     const encryptedContent = await window.crypto.subtle.encrypt(
       {
         name: "AES-GCM",
         iv: iv,
+        tagLength: 128,
       },
       aesKey,
       secretData
       // enc.encode(secretData)
     );
+
+    // todo: return obj w/ iv, authTag, salt and cipherText
+    // todo: using ui selectors let the user control how they'd like their stuff packaged.
+    // crypto.subtle.encrypt already appends cipherTag at the end of the ciphertext (last 16 bytes)
+    // as seen in the code below.
+
+    // extract the ciphertext and authentication tag
+    // const ciphertext = encryptedContent.slice(0, encryptedContent.byteLength - 16);
+    // const authTag = encryptedContent.slice(encryptedContent.byteLength - 16);
+   
+    // return {
+    //   ciphertext: new Uint8Array(ciphertext),
+    //   iv,
+    //   authTag: new Uint8Array(authTag),
+    //   salt,
+    // };
+
+
     const encryptedContentArr = new Uint8Array(encryptedContent);
     let buff = new Uint8Array(
       salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
@@ -65,8 +85,11 @@ export async function encrypt({ input: secretData, password, infoOnly }) {
     buff.set(iv, salt.byteLength);
     buff.set(encryptedContentArr, salt.byteLength + iv.byteLength);
     return buff.buffer;
-    const base64Buff = buff_to_base64(buff);
-    return base64Buff;
+
+
+    // return base64
+    // const base64Buff = buff_to_base64(buff);
+    // return base64Buff;
   } catch (e) {
     console.log(`Error - ${e}`);
     return "";
@@ -86,6 +109,7 @@ export async function decrypt({ input: encryptedData, password }) {
       {
         name: "AES-GCM",
         iv: iv,
+        tagLength: 128,
       },
       aesKey,
       data
