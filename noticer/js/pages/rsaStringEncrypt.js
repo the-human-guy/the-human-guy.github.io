@@ -1,6 +1,6 @@
 import { generateRSAKeyPair, encryptStringRsa } from "../utils/rsa_encryption.js";
 
-const { useState } = ReactRouterDOM;
+const { useState } = React;
 
 export const RsaStringEncryptPage = () => {
   const [inputString, setInputString] = useState("");
