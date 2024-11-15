@@ -1,8 +1,7 @@
 # the-human-guy.github.io
 
 todo:
-- add proper cbc with real key derivation algo and random iv
-- gcm
+- fix key derivation algo and iv generation in cbc mode (pbkdf2 + random iv)
 - ocb?
 - ctr?
 - pgp -- https://www.npmjs.com/package/openpgp#browser-plain-files
