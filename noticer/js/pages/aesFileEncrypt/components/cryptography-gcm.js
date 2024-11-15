@@ -2,12 +2,11 @@ import {
   encrypt,
   decrypt,
 } from "../../../utils/aes-gcm.js";
-import { is256BitHex } from "../../../utils/rgx_test.js";
 import { PasswordInput } from '../../../components/passwordInput.js';
 const { useEffect, useState } = React
 
 export const CryptographyGCM = ({
-  file: inputFile,
+  arrayBuffer,
   children,
 }) => {
   const [passphrase, setPassphrase] = useState("");
@@ -15,58 +14,46 @@ export const CryptographyGCM = ({
 
   useEffect(() => {
     (async () => {
-      const info = await encrypt(inputFile)
+      const info = await encrypt({ input: arrayBuffer, password: passphrase, infoOnly: true })
+      setCryptoInfo(info)
+      window.x = info
     })()
   }, [passphrase]);
 
-  const encryptAes256 = (onSuccess) => {
-    if (inputFile && (passphrase || is256BitHex(aesKey))) {
-      const reader = new FileReader();
-      reader.onload = async function () {
-        try{
-          const encrypted = await encryptAes(
-            reader.result,
-            aesKey,
-            aesIv
-          );
-          const newFile = new File([new Blob([encrypted], { type: 'text/plain' })], `encrypted-${inputFile.name}`);
-          onSuccess(newFile);
-        }catch(err){
-          console.error('Encryption failed: ', err)
-          alert('Encryption failed')
-        }
-        
-      };
-      reader.readAsArrayBuffer(inputFile);
+  const encryptAes256 = async (onSuccess) => {
+    if (arrayBuffer && passphrase) {
+      try{
+        const encrypted = await encrypt({
+          input: arrayBuffer,
+          password: passphrase
+        });
+        onSuccess(encrypted);
+      } catch(err) {
+        console.error('Encryption failed: ', err)
+        alert('Encryption failed')
+      }
     }
   };
 
-  const decryptAes256 = (onSuccess) => {
-    if (inputFile && (passphrase || is256BitHex(aesKey))) {
-      const reader = new FileReader();
-      reader.onload = async function () {
-        try{
-          const decrypted = await decryptAes(
-            reader.result,
-            aesKey,
-            aesIv
-          );
-          console.log(decrypted);
-          const newFile = new File([new Blob([decrypted], { type: 'text/plain' })], `decrypted-${inputFile.name}`);
-          onSuccess(newFile)
-        } catch(err) {
-          console.error('Decryption failed: ', err)
-          alert('Decryption failed')
-        }
-       
-      };
-      reader.readAsArrayBuffer(inputFile);
+  const decryptAes256 = async (onSuccess) => {
+    if (arrayBuffer && passphrase) {
+      try{
+        const decrypted = await decrypt({
+          input: arrayBuffer,
+          password: passphrase,
+        });
+        console.log(decrypted);
+        onSuccess(decrypted)
+      } catch(err) {
+        console.error('Decryption failed: ', err)
+        alert('Decryption failed')
+      }
     }
   };
 
   return (
     <>
-      {((!passphrase && !aesKey) || passphrase) && (
+      {((!passphrase) || passphrase) && (
         <div>
           <label htmlFor="input-pass">
             Input passphrase (ex. 123456)
@@ -78,54 +65,12 @@ export const CryptographyGCM = ({
         </div>
       )}
 
-      {(passphrase || aesKey) && (
+      {(passphrase) && (
         <>
           <details class="card">
             <summary>Details</summary>
-            <div style={{ overflow: 'auto', whiteSpace: 'nowrap' }}>
-              <div>
-                <span>
-                  Encryption algorithm:
-                </span>{" "}
-                AES-CBC
-              </div>
-              {passphrase && (
-                <div>
-                  <span>Key algorithm:</span>{" "}
-                  Passphrase + SHA256
-                </div>
-              )}
-
-              <div>
-                <span>
-                  Key (hex)(256bit):
-                </span>{" "}
-                {aesKey}
-              </div>
-              <div>
-                <span>Iv algorithm:</span> Key
-                + substring(0, 32)
-              </div>
-              <div>
-                <span>Iv (hex)(128bit):</span>{" "}
-                {aesIv}
-              </div>
-              <div>
-                <span>Padding :</span> PKCS#7
-              </div>
-              <div>
-                <span>Openssl Equivalent:</span>
-              </div>
-              <div>
-                <span>Encrypt:</span> openssl
-                enc -aes-256-cbc -nosalt -e -in input.jpg -out
-                output.jpg -K {aesKey} -iv {aesIv}
-              </div>
-              <div>
-                <span>Decrypt:</span> openssl
-                enc -aes-256-cbc -nosalt -d -in input.jpg -out
-                output.jpg -K {aesKey} -iv {aesIv}
-              </div>
+            <div style={{ overflow: 'auto', whiteSpace: 'break-spaces' }}>
+              {!!cryptoInfo && JSON.stringify(cryptoInfo, null, 2)}
             </div>
           </details>
 

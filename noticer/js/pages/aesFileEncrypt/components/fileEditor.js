@@ -12,10 +12,14 @@ const PREVIEW_MODE = {
 }
 
 export const FileEditor = ({ onSave, file: originalFile }) => {
-  const [fileContent, setFileContent] = useState();
+  const [fileContent, setFileContent] = useState(null);
   const [previewMode, setPreviewMode] = useState(false);
  
   const resetToOriginalFile = () => {
+    console.log('resetToOriginalFile: ', originalFile)
+    if (!originalFile)
+      return setFileContent(null)
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const fileContent = event.target.result;

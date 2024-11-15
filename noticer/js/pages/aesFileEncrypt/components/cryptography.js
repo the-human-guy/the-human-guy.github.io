@@ -19,7 +19,7 @@ export const Cryptography = (props) => {
     onFileEncrypt: onFileEncryptProp,
     onFileDecrypt: onFileDecryptProp,
   } = props
-  const [selectedAlgo, selectAlgo] = useState(CRYPTO_ALGO.CBC.code);
+  const [selectedAlgo, selectAlgo] = useState(CRYPTO_ALGO.GCM.code);
   const [fileArrayBuffer, setFileArrayBuffer] = useState(null)
 
   useEffect(() => {

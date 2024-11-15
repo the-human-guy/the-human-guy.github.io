@@ -13,16 +13,6 @@ const base64_to_buf = (b64) =>
 const enc = new TextEncoder();
 const dec = new TextDecoder();
 
-export async function encrypt({ input, password }) {
-  const encryptedData = await encryptData(input, password);
-  return encryptedData;
-}
-
-export async function decrypt({ input, password }) {
-  const decryptedData = await decryptData(input, password);
-  return decryptedData;
-}
-
 const getPasswordKey = (password) =>
   window.crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, [
     "deriveKey",
@@ -42,7 +32,7 @@ const deriveKey = (passwordKey, salt, keyUsage) =>
     keyUsage
   );
 
-async function encryptData(secretData, password, infoOnly) {
+export async function encrypt({ input: secretData, password, infoOnly }) {
   try {
     const salt = window.crypto.getRandomValues(new Uint8Array(16));
     const iv = window.crypto.getRandomValues(new Uint8Array(12));
@@ -64,7 +54,8 @@ async function encryptData(secretData, password, infoOnly) {
         iv: iv,
       },
       aesKey,
-      enc.encode(secretData)
+      secretData
+      // enc.encode(secretData)
     );
     const encryptedContentArr = new Uint8Array(encryptedContent);
     let buff = new Uint8Array(
@@ -73,6 +64,7 @@ async function encryptData(secretData, password, infoOnly) {
     buff.set(salt, 0);
     buff.set(iv, salt.byteLength);
     buff.set(encryptedContentArr, salt.byteLength + iv.byteLength);
+    return buff.buffer;
     const base64Buff = buff_to_base64(buff);
     return base64Buff;
   } catch (e) {
@@ -81,9 +73,10 @@ async function encryptData(secretData, password, infoOnly) {
   }
 }
 
-async function decryptData(encryptedData, password) {
+export async function decrypt({ input: encryptedData, password }) {
   try {
-    const encryptedDataBuff = base64_to_buf(encryptedData);
+    // const encryptedDataBuff = base64_to_buf(encryptedData);
+    const encryptedDataBuff = new Uint8Array(encryptedData);
     const salt = encryptedDataBuff.slice(0, 16);
     const iv = encryptedDataBuff.slice(16, 16 + 12);
     const data = encryptedDataBuff.slice(16 + 12);
@@ -97,7 +90,8 @@ async function decryptData(encryptedData, password) {
       aesKey,
       data
     );
-    return dec.decode(decryptedContent);
+    return decryptedContent;
+    // return dec.decode(decryptedContent);
   } catch (e) {
     console.log(`Error - ${e}`);
     return "";
