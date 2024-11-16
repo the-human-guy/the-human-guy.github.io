@@ -1,9 +1,34 @@
 import {
   encrypt,
   decrypt,
+  SALT_BYTE_SIZE,
+  IV_BYTE_SIZE,
 } from "../../../utils/aes-gcm.js";
 import { PasswordInput } from '../../../components/passwordInput.js';
 const { useEffect, useState } = React
+
+const PACKAGE_MODE = {
+  prepend: {
+    label: 'Prepend salt & IV',
+    description: `salt (${SALT_BYTE_SIZE} bytes) + iv (${IV_BYTE_SIZE} bytes) + cipherText`,
+    pack: ({ cipherText, iv, salt }) => {
+      const encryptedContentArr = new Uint8Array(cipherText);
+      let buff = new Uint8Array(
+        salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
+      );
+      buff.set(salt, 0);
+      buff.set(iv, salt.byteLength);
+      buff.set(encryptedContentArr, salt.byteLength + iv.byteLength);
+      return buff.buffer;
+    },
+    unpack: (arrayBuffer) => {
+      const encryptedDataBuff = new Uint8Array(arrayBuffer);
+      const salt = encryptedDataBuff.slice(0, SALT_BYTE_SIZE);
+      const iv = encryptedDataBuff.slice(SALT_BYTE_SIZE, SALT_BYTE_SIZE + IV_BYTE_SIZE);
+      return { salt, iv }
+    }
+  }
+}
 
 export const CryptographyGCM = ({
   arrayBuffer,
@@ -11,23 +36,18 @@ export const CryptographyGCM = ({
 }) => {
   const [passphrase, setPassphrase] = useState("");
   const [cryptoInfo, setCryptoInfo] = useState({});
-
-  useEffect(() => {
-    (async () => {
-      const info = await encrypt({ input: arrayBuffer, password: passphrase, infoOnly: true })
-      setCryptoInfo(info)
-      window.x = info
-    })()
-  }, [passphrase]);
+  const [selectedPackageMode, setSelectedPackageMode] = useState(PACKAGE_MODE.prepend);
 
   const encryptAes256 = async (onSuccess) => {
     if (arrayBuffer && passphrase) {
-      try{
+      try {
         const encrypted = await encrypt({
           input: arrayBuffer,
           password: passphrase
         });
-        onSuccess(encrypted);
+
+        setCryptoInfo(encrypted)
+        onSuccess(selectedPackageMode.pack(encrypted));
       } catch(err) {
         console.error('Encryption failed: ', err)
         alert('Encryption failed')
@@ -37,10 +57,13 @@ export const CryptographyGCM = ({
 
   const decryptAes256 = async (onSuccess) => {
     if (arrayBuffer && passphrase) {
-      try{
+      try {
+        const { salt, iv } = selectedPackageMode.unpack(arrayBuffer)
         const decrypted = await decrypt({
           input: arrayBuffer,
           password: passphrase,
+          iv,
+          salt
         });
         console.log(decrypted);
         onSuccess(decrypted)
@@ -53,17 +76,15 @@ export const CryptographyGCM = ({
 
   return (
     <>
-      {((!passphrase) || passphrase) && (
-        <div>
-          <label htmlFor="input-pass">
-            Input passphrase (ex. 123456)
-          </label>
-          <PasswordInput
-            onChange={(e) => setPassphrase(e.target.value)}
-            id="input-pass"
-          />
-        </div>
-      )}
+      <div>
+        <label htmlFor="input-pass">
+          Input passphrase (ex. 123456)
+        </label>
+        <PasswordInput
+          onChange={(e) => setPassphrase(e.target.value)}
+          id="input-pass"
+        />
+      </div>
 
       {(passphrase) && (
         <>

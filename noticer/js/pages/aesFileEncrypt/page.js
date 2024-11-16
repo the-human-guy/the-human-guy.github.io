@@ -29,6 +29,7 @@ export function AesFileEncryptPage() {
   const resetForm = () => {
     document.getElementById("file-input-form").reset();
     setInputFile(null);
+    setUsingEditor(false);
   }
 
   const openInEditor = () => setUsingEditor(true)

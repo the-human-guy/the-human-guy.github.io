@@ -9,7 +9,7 @@ const CRYPTO_ALGO = {
   },
   CBC: {
     code: 'aes256-cbc',
-    label: 'AES256-CBC (broken atm)',
+    label: 'AES256-CBC',
   },
 }
 

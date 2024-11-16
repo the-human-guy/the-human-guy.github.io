@@ -1,6 +1,6 @@
 // based on: https://github.com/bradyjoslin/webcrypto-example/blob/master/script.js
 export const SALT_BYTE_SIZE = 16;
-export const IV_BYTE_SIZE = 12
+export const IV_BYTE_SIZE = 16
 
 const getPasswordKey = (password) =>
   window.crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, [
@@ -16,7 +16,7 @@ const deriveKey = (passwordKey, salt, keyUsage) =>
       hash: "SHA-256",
     },
     passwordKey,
-    { name: "AES-GCM", length: 256 },
+    { name: "AES-CBC", length: 256 },
     false,
     keyUsage
   );
@@ -35,9 +35,8 @@ export async function encrypt({ input: secretData, password }) {
     // cipherText is ArrayBuffer
     const cipherText = await window.crypto.subtle.encrypt(
       {
-        name: "AES-GCM",
+        name: "AES-CBC",
         iv,
-        tagLength: 128,
       },
       aesKey,
       secretData
@@ -71,15 +70,14 @@ export async function encrypt({ input: secretData, password }) {
 
 export async function decrypt({ input: encryptedData, password, salt, iv }) {
   try {
-    const encryptedDataBuff = encryptedData;
+    const encryptedDataBuff = new Uint8Array(encryptedData);
     const data = encryptedDataBuff.slice(SALT_BYTE_SIZE + IV_BYTE_SIZE);
     const passwordKey = await getPasswordKey(password);
     const aesKey = await deriveKey(passwordKey, salt, ["decrypt"]);
     const decryptedContent = await window.crypto.subtle.decrypt(
       {
-        name: "AES-GCM",
+        name: "AES-CBC",
         iv,
-        tagLength: 128,
       },
       aesKey,
       data
