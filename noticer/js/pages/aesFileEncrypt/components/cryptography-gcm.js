@@ -37,16 +37,18 @@ export const CryptographyGCM = ({
   const [passphrase, setPassphrase] = useState("");
   const [cryptoInfo, setCryptoInfo] = useState({});
   const [selectedPackageMode, setSelectedPackageMode] = useState(PACKAGE_MODE.prepend);
+  const [isKeyExtractable, selectKeyExtractability] = useState(false);
 
   const encryptAes256 = async (onSuccess) => {
     if (arrayBuffer && passphrase) {
       try {
         const encrypted = await encrypt({
           input: arrayBuffer,
-          password: passphrase
+          password: passphrase,
+          extractableKey: isKeyExtractable,
         });
 
-        setCryptoInfo(encrypted)
+        setCryptoInfo(encrypted?.info)
         onSuccess(selectedPackageMode.pack(encrypted));
       } catch(err) {
         console.error('Encryption failed: ', err)
@@ -86,7 +88,14 @@ export const CryptographyGCM = ({
         />
       </div>
 
-      {(passphrase) && (
+      <legend>Cryptography</legend>
+
+      <select onChange={e => selectKeyExtractability(e.target.value)} value={isKeyExtractable}>
+        <option value={false}>Non-extractable AES key (safe, encrypt-only)</option>
+        <option value={true}>Extractable AES key (unsafe, encrypt+decrypt)</option>
+      </select>
+
+      {!!cryptoInfo && (
         <>
           <details class="card">
             <summary>Details</summary>
