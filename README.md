@@ -1,4 +1,5 @@
 # the-human-guy.github.io
 
-[noticer](the-human-guy.github.io/noticer)
-[pieces](github.com/the-human-guy/pieces)
+[noticer](https://the-human-guy.github.io/noticer)
+
+[pieces](https://github.com/the-human-guy/pieces)
